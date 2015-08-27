@@ -4,23 +4,6 @@
 	require_once('config.inc.php');
 	$db->beginTransaction();
 	prepare_table($db);
-	$log_dir_opt=getopt("",array('log_dir:'));
-	if(false!==$log_dir_opt && !empty($log_dir_opt['log_dir'])){
-		$_REQUEST['log_dir']=$log_dir_opt['log_dir'];
-	}	
-	unset($log_dir_opt);
-	if(empty($_REQUEST['log_dir'])){
-		$_REQUEST['log_dir']='/path/to/log';
-		echo "warning: no log_dir specified. default to: ".hhb_tohtml($_REQUEST['log_dir']);
-	}
-	$log_dir=$_REQUEST['log_dir'];
-	if(!is_dir($log_dir))
-	{
-		die('error: log_dir is not a directory!: '.hhb_tohtml($log_dir));
-	}
-	if(!is_readable($log_dir)){
-		die('error: can not read log_dir directory: '.hhb_tohtml($log_dir));
-	}
 	$logfiles=get_logfiles_from_dir($log_dir);
 	if(count($logfiles)<=0){
 		die('error: no logfiles found in log_dir: '.hhb_tohtml($log_dir));

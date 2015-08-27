@@ -15,7 +15,7 @@
 		$_REQUEST['log_dir']=$log_dir_opt['log_dir'];
 		$log_dir=$_REQUEST['log_dir'];
 	}	
-	if(!is_dir($log_dir))
+	if(!is_dir($log_dir)) 
 	{
 		die('error: log_dir is not a directory!: '.hhb_tohtml($log_dir));
 	}
