@@ -2,8 +2,9 @@
 	require_once('hhb_.inc.php');
 	hhb_init();
 	require_once('config.inc.php');
-	$db->beginTransaction();
 	prepare_table($db);
+	$db->beginTransaction();
+	echo "pdo attributes:".dump_pdo_attributes($db).PHP_EOL;
 	$logfiles=get_logfiles_from_dir($log_dir);
 	if(count($logfiles)<=0){
 		die('error: no logfiles found in log_dir: '.hhb_tohtml($log_dir));
@@ -11,7 +12,7 @@
 	echo "logfiles found: ".count($logfiles).". printing filenames:";
 	echo '<pre>'.PHP_EOL;
 	echo hhb_tohtml(print_r($logfiles,true));
-	echo "\n\n<pre>\n\n";
+	echo "\n\n</pre>\n\n";
 	$totalRequestsProcessed=0;
 	$toalRequestsIgnored=0;
 	foreach($logfiles as $current_logfile){
@@ -21,7 +22,7 @@
 			$lines=@file($current_logfile);
 		}
 		if(!is_array($lines) || count($lines)<=1){
-			echo "Error: cannot read the format of logfile ".hhb_tohtml($log_dir).". ignoring this logfile.";
+			echo "Error: cannot read the format of logfile ".hhb_tohtml($current_logfile).". ignoring this logfile.";
 			continue;
 		}
 		trimlines($lines);
@@ -204,8 +205,19 @@
 	
 	
 	function prepare_table($db){
+	$dbtype=$db->getAttribute(PDO::ATTR_DRIVER_NAME);
 		$sql='CREATE TABLE `http_accesslogs` (
-		`id` INTEGER PRIMARY KEY AUTOINCREMENT,
+		`id` INTEGER PRIMARY KEY ';
+		if(strcasecmp($dbtype,'sqlite')==0){
+		$sql.='AUTOINCREMENT';
+		} else if(strcasecmp($dbtype,'mysql')==0){
+		$sql.='AUTO_INCREMENT';
+		} else {
+		//dunno what database this is... not sqlite, not mysql..
+		echo "warning: unknown database type: ".hhb_tohtml($dbtype);
+		$sql.='AUTOINCREMENT';
+		}
+		$sql.=',
 		`time` DATETIME NULL,
 		`ip` VARCHAR(255) NULL,
 		`request_type` VARCHAR(255) NULL,
@@ -218,10 +230,8 @@
 		`user_agent` MEDIUMTEXT NULL);';
 		//ENGINE = InnoDB;';
 		$db->query("DROP TABLE IF EXISTS `http_accesslogs`");
-		$db->query($sql);
-		
-	}
-	
+		$db->query($sql);		
+	}	
 	function trimlines(&$lines_arr){
 		foreach($lines_arr as $key=>&$line){
 			$line=trim($line);
@@ -231,6 +241,7 @@
 		}
 	}
 	function get_logfiles_from_dir($dir){
+	assert(chdir($dir));
 		$files=glob("access.log*");
 		$ret=array();
 		foreach($files as $file){
