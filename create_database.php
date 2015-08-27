@@ -181,8 +181,23 @@
 	}
 	echo "committing to db...";
 	$db->commit();
-	echo "\ndone! \ntotal requests processed: ".$totalRequestsProcessed."\ntotal requests ignored/unparsable: ".$toalRequestsIgnored;
 	
+	echo 'done. ';
+	$dbtype=$db->getAttribute(PDO::ATTR_DRIVER_NAME);
+	if(strcasecmp($dbtype,'sqlite')==0){
+	 echo 'now vacuum..';
+	$db->query('VACUUM');
+	} else if (strcasecmp($dbtype,'mysql')==0){
+	echo 'now OPTIMIZE TABLE..';
+	$db->query('OPTIMIZE NO_WRITE_TO_BINLOG TABLE `http_accesslogs`');
+	} else if(strcasecmp($dbtype,'pqsql')==0){
+	 echo 'now VACUUM `http_accesslogs`';
+	$db->query('VACUUM `http_accesslogs`');
+	} else {
+	echo "nevermind...";
+	}
+	echo "\ndone! \ntotal requests processed: ".$totalRequestsProcessed."\ntotal requests ignored/unparsable: ".$toalRequestsIgnored;
+	//var_dump(dump_pdo_attributes($db));
 	
 	
 	
@@ -231,3 +246,28 @@
 		}
 		return $ret;
 	}
+	function dump_pdo_attributes($db){
+	$attributes=array(
+	'PDO::ATTR_AUTOCOMMIT',
+	'PDO::ATTR_CASE',
+	'PDO::ATTR_CLIENT_VERSION',
+	'PDO::ATTR_CONNECTION_STATUS',
+	'PDO::ATTR_DRIVER_NAME',
+	'PDO::ATTR_ERRMODE',
+	'PDO::ATTR_ORACLE_NULLS',
+	'PDO::ATTR_PERSISTENT',
+	'PDO::ATTR_PREFETCH',
+	'PDO::ATTR_SERVER_INFO',
+	'PDO::ATTR_SERVER_VERSION',
+	'PDO::ATTR_TIMEOUT');
+$ret="";
+foreach($attributes as $attribute){
+	$ret.=$attribute.'->';
+	try{
+	$ret.=var_export($db->getAttribute(eval('return '.$attribute.';')),true).PHP_EOL;
+	}catch(Exception $ex){
+	$ret.=$ex->getMessage().PHP_EOL;
+	}
+}
+return $ret;
+}
