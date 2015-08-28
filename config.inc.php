@@ -14,7 +14,9 @@
 	if(false!==$log_dir_opt && !empty($log_dir_opt['log_dir'])){
 		$_REQUEST['log_dir']=$log_dir_opt['log_dir'];
 		$log_dir=$_REQUEST['log_dir'];
-	}	
+	} else if(!empty($_REQUEST['log_dir'])){
+	$log_dir=$_REQUEST['log_dir'];
+	}
 	if(!is_dir($log_dir)) 
 	{
 		die('error: log_dir is not a directory!: '.hhb_tohtml($log_dir));
@@ -22,3 +24,4 @@
 	if(!is_readable($log_dir)){
 		die('error: can not read log_dir directory: '.hhb_tohtml($log_dir));
 	}
+	
