@@ -450,6 +450,7 @@ function hhb_exception_error_handler($errno, $errstr, $errfile, $errline ) {
         // This error code is not included in error_reporting
         return;
     }
+	//var_dump(func_get_args());
     throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 }
 function hhb_combine_filepaths( /*...*/ ) {
