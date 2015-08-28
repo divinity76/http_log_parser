@@ -206,6 +206,8 @@
 	
 	function prepare_table($db){
 	$dbtype=$db->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+	
 		$sql='CREATE TABLE `http_accesslogs` (
 		`id` INTEGER PRIMARY KEY ';
 		if(strcasecmp($dbtype,'sqlite')==0){
