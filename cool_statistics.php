@@ -159,10 +159,12 @@
 	<div id="contents_overview" style="background-color:grey;">
 		<ul>
 			<?php
+			call_user_func(function(){
 				$list_stuff=array('#most_popular_pages'=>'most popular pages','#distinct_visitors_by_country'=>'distinct visitors by country','#browsers_by_popularity'=>'browsers by popularity');
 				foreach($list_stuff as $key=>$thang){
 					echo '<li><a href="'.$key.'">'.hhb_tohtml($thang).'</a></li>'.PHP_EOL;
 				}
+			});
 			?>
 		</ul>
 	</div>
@@ -190,7 +192,7 @@
 					echo '<span data-name="url" style="color:green">';
 					echo hhb_tohtml($url['url']);
 					echo '</span> views: <span data-name="views">'.hhb_tohtml($url['value_occurrence']).'</span>. ';
-					echo 'distinct ips: <span data-name="distinct_ips">'.hhb_tohtml($url['distinct_ips']).'</span>';
+					echo 'distinct ips: <span data-name="distinct_ips">'.hhb_tohtml($url['distinct_ips']).'</span>.';
 					echo '</li>'.PHP_EOL;
 					$total_views+=((int)$url['value_occurrence']);
 				}
@@ -203,7 +205,7 @@
 				echo "Total pageviews: ".hhb_tohtml($total_views).". total total distinct ips: ".hhb_tohtml($total_ips).". ";
 			});
 			$endtime=microtime(true);
-			echo "seconds used counting most popular pages: ".($endtime-$starttime);
+			echo "seconds used counting most popular pages: ".($endtime-$starttime).'.';
 			unset($starttime,$endtime);
 		?>
 	</div>
@@ -221,8 +223,6 @@
 					$counteries_total_requests=array();
 					$counter=0;
 					//$allIPs=$ips->fetchAll();var_dump($allIPs);die("rDIEDS");
-					
-					
 					while(false!==($ip=$ips->fetch(PDO::FETCH_ASSOC))){
 						//$starttime=microtime(true);
 						$country=ipv4_to_country_v2($ip['ip']);
@@ -244,14 +244,14 @@
 					$counteries_distinct_ips=array_reverse($counteries_distinct_ips,true);
 					//$endtime=microtime(true);echo "sort used ".($endtime-$starttime)." seconds..";var_dump($counteries);die("DIEDS");
 					foreach($counteries_distinct_ips as $country=>$distinct_ips){
-						echo '<li>'.hhb_tohtml($country).': distinct IPs: '.hhb_tohtml($distinct_ips).'. total requests:'.hhb_tohtml($counteries_total_requests[$country]).'</li>'.PHP_EOL;
+						echo '<li>'.hhb_tohtml($country).': distinct IPs: '.hhb_tohtml($distinct_ips).'. total requests:'.hhb_tohtml($counteries_total_requests[$country]).'.</li>'.PHP_EOL;
 					}
 					
 				});
 				$endtime=microtime(true);
 			?>
 		</ol>
-		<?php echo "seconds used counting counteries:".($endtime-$starttime);unset($starttime,$endtime);?>
+		<?php echo "seconds used counting counteries:".($endtime-$starttime).'.';unset($starttime,$endtime);?>
 	</div>
 	<div id="browsers_by_popularity" style="background-color:antiquewhite;">
 		<div style="text-align:center">Browsers by popularity (warning: detection is not easy...)</div>
@@ -287,7 +287,7 @@
 		}
 		//var_dump($browsers);
 		foreach($browsers as $browser=>$info){
-			echo '<li>'.hhb_tohtml($browser).': '.hhb_tohtml($info['distinct_ips']).' distinct IPs. '.hhb_tohtml($info['occurences']).' total requests.'.'</li>'.PHP_EOL;
+			echo '<li>'.hhb_tohtml($browser).': distinct IP\'s: '.hhb_tohtml($info['distinct_ips']).'. total requests: '.hhb_tohtml($info['occurences']).'.</li>'.PHP_EOL;
 		}
 		ini_set("browscap",$oldcap);
 		});
@@ -296,7 +296,7 @@
 	?>
 	</ol>
 	<?php 
-		echo "seconds used counting browsers: ".($endtime-$starttime);
+		echo "seconds used counting browsers: ".($endtime-$starttime).'.';
 		unset($endtime,$starttime);
 	?>
 	</div>
